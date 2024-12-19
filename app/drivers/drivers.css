@@ -1,0 +1,36 @@
+/* Force main scrollbar to always show */
+html {
+    overflow-x: scroll;
+    min-width: 1200px;
+}
+
+/* Hide all other scrollbars */
+body, div {
+    overflow-x: visible;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+}

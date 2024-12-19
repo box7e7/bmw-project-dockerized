@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type BmwVehicle {
+  color String?
+  make  String?
+  model String?
+  vin   String
+  year  String?
+}
+
+model bmw {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  DriverName      String
+  PO              Float      @unique(map: "PO_1")
+  PdfCreatedAt    String?
+  callId          Float?
+  casePO          String
+  completed       String
+  contact         String
+  createdAT       DateTime
+  dispached_date  String?
+  driverIdTowbook Float?
+  price           Float
+  service         String
+  serviceType     String?
+  towFrom         String
+  towTo           String?
+  vehicle         BmwVehicle
+  update          Boolean?
+}
+
+model cards {
+  id                 String  @id @default(auto()) @map("_id") @db.ObjectId
+  CARD_NUMBER        String  @map("CARD NUMBER")
+  CARDHOLDER_ADDRESS String  @map("CARDHOLDER ADDRESS")
+  CARDHOLDER_NAME    String  @map("CARDHOLDER NAME")
+  CVC2_NUMBER        String  @map("CVC2 NUMBER")
+  DATE               String
+  DRIVER             String
+  EXPIRATION_DATE    String  @map("EXPIRATION DATE")
+  JOB_DETAILS        String  @map("JOB DETAILS")
+  Price              String
+  REF_               String  @map("REF#")
+  account_type       String?
+  charged            String
+  errors             String?
+  payment_id         String?
+  time_charge        String?
+  updated            String
+}
+
+model sessions {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  date       String
+  session_id String
+}
+
+model sessions_0 {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  date       String
+  session_id String
+}

@@ -1,0 +1,72 @@
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+import os
+
+
+
+
+
+# Set up the SMTP server and login credentials
+smtp_server = "smtp.gmail.com"
+smtp_port =  587  # Use 465 for SSL
+email_address = "mehdi2neggazi@gmail.com"
+password = "iiggynwdlkcaiibm"
+
+# Get the current working directory
+current_directory = os.getcwd()
+# print("Current Working Directory:", current_directory)
+
+
+# Path to the directory you want to scan
+folder_path = f'{current_directory}/scripts/tmp'  # Replace with your folder path
+
+# List to hold file names
+file_names = []
+
+# Loop through each file in the directory
+for file in os.listdir(folder_path):
+    # Create full file path
+    full_path = os.path.join(folder_path, file)
+    # Check if it's a file and not a directory
+    if os.path.isfile(full_path):
+        file_names.append(file)
+
+# Now file_names list contains names of all the files in the folder
+print({"file_names":file_names})
+
+
+# Create a multipart message
+msg = MIMEMultipart()
+msg['From'] = email_address
+msg['To'] = "mehdi2neggazi@gmail.com"
+msg['Subject'] = f'{len(file_names)} invoices'
+
+# Email body
+body = f"attached {len(file_names)} pdf invoices."
+msg.attach(MIMEText(body, 'plain'))
+
+
+
+
+for file_name in file_names:
+    attachment = open(f'{folder_path}/{file_name}', "rb")
+    part = MIMEBase('application', 'octet-stream')
+    part.set_payload((attachment).read())
+    encoders.encode_base64(part)
+    part.add_header('Content-Disposition', "attachment; filename= %s" % file_name)
+    msg.attach(part)
+
+# Start the server and send the email
+try:
+    server = smtplib.SMTP(smtp_server, smtp_port)
+    server.starttls()
+    server.login(email_address, password)
+    text = msg.as_string()
+    server.sendmail(email_address, msg['To'], text)
+    server.quit()
+    print({"status":"Email sent successfully!"})
+except Exception as e:
+    print({"error":e})

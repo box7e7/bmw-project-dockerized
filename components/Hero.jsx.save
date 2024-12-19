@@ -1,0 +1,304 @@
+import { useState,useEffect } from 'react';
+import React from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import DateRangeSelector from '../components/DateRangeSelector';
+import "react-datepicker/dist/react-datepicker.css";
+import Logo from './Logo';
+
+
+// function extractZipCode(address) {
+//   const regex = /,\s*TX\s+(\d{5}(?:-\d{4})?)\b/;
+
+//     const match = address.match(regex);
+//     const zipCode = match ? match[1] : null ;
+//     return zipCode
+// }
+
+//function extractZipCode(address) {
+//  const regex = /\b(\d{5}(?:-\d{4})?)\b/;
+//  const match = address.match(regex);
+//  const zipCode = match ? match[1] : null;
+//  return zipCode;
+//}
+
+
+
+function extractZipCode(address) {
+    const regexPattern = /\b\d{5}\b/g; // 'g' modifier for global search
+    const matches = inputString.match(regexPattern);
+    return matches || [];
+}
+
+
+function parseJsonFromString(str) {
+  try {
+      // Convert to valid JSON string format
+      let jsonString = str.replace(/'/g, '"').replace(/(\w+):/g, '"$1":');
+      return JSON.parse(jsonString);
+  } catch (e) {
+      console.error("Error parsing JSON from string:", e);
+      return null;
+  }
+}
+
+
+const callApi = async (setState) => {
+  setState(previous => ({ ...previous, isLoading: true }));
+
+  try {
+    const response = await fetch('/api/getData');
+    const data = await response.json();
+
+    if(response.error){
+      setState(previous => ({ ...previous, response: data, error: response.error }));
+    }
+    else{
+      setState(previous => ({ ...previous, response: data, error: undefined }));
+    }
+  } catch (error) {
+    setState(previous => ({ ...previous, response: undefined, error }));
+  } finally {
+    setState(previous => ({ ...previous, isLoading: false }));
+  }
+};
+
+
+
+
+
+
+
+
+
+const Hero = () =>{
+  const [state, setState] = useState({ isLoading: false, response: undefined, error: undefined });
+  const [dispatch, setDispatch] = useState([]);
+  const [files, setFiles] = useState([]);
+  
+  
+
+  const [startDate, setStartDate] = useState(new Date(Date.now() - 24 * 3600 * 1000));
+  const [endDate, setEndDate] = useState(new Date());
+  const { user, error, isLoading } = useUser();
+
+  // console.log("//// start date /////\n",startDate)
+  // console.log("//// end date /////\n",endDate)
+  //  console.log("/////$$$ files $$$/////\n",files)
+
+  console.log("//// state ////\n",state)
+  console.log("//// Dispatch ////\n",dispatch)
+
+  let sum=0
+  Array.isArray(state.response) ? state.response?.forEach(element => {
+    sum=sum+element.price
+  }) :  null;
+
+
+  const handleEndDateChange = async(date) => {
+    if (date >= startDate) {
+      setEndDate(date);
+      }
+      else{
+        alert("select account name first then select date range again")
+      }
+    }
+
+
+    const handleCheckboxChange = (e, item) => {
+      // Update your state to reflect the new checked status
+      // Assuming you have a method to update your state, it might look something like this:
+      const updatedItems = state.response.map(it => {
+        if (it.PO === item.PO) {
+        let item_json={ ...it, update: e.target.checked }
+          // Make the GET request
+        fetch(`/api/updateItem?obj=${JSON.stringify(item_json)}`)
+            .then(response => response.json())
+            .then(data => console.log("///// update item fetch /////",data))
+            .catch(error => console.error('Error:', error));
+          return item_json; // Update the 'update' field based on checkbox status
+        }
+        return it;
+      });
+    
+      // Call your state update method here, e.g., setState({ ...state, response: updatedItems });
+      setState({ ...state, response: updatedItems });
+    };
+  
+
+    const handleDispatchCheckboxChange = (e, item) => {
+
+      console.log("//// checked ////",e.target.checked)
+
+      // e.target is the input element
+      const inputElement = e.target;
+
+      // Traverse up to get the TD element
+      const tdElement = inputElement.parentElement.parentElement;
+      console.log("&&&&&&&",tdElement)
+
+
+      if(e.target.checked){
+        let arr=dispatch
+        arr.push(item.PO)
+        setDispatch(arr)
+      }
+
+      else{
+        let arr=dispatch
+        arr = arr.filter(it => it !== item.PO)
+  
+
+
+
+
+      setDispatch(arr)
+      }
+      console.log(dispatch)
+        
+    }
+
+  useEffect(()=>{
+    callApi(setState)
+  },[])
+
+  console.log("/// state ////", state)
+  return (
+    
+    user && (<div className="hero my-5 text-center flex items-center justify-center" data-testid="hero">
+      
+      
+      
+      {/* {ReturnJSX(state)} */}
+
+    {!isLoading ? (state.response && !state?.response?.error ? 
+    
+      <div>
+
+        {/* <div className=' font-bold text-gray-600'>Select Date Range</div>
+        <DateRangeSelector setEndDate={setEndDate} setStartDate={setStartDate} endDate={endDate} startDate={startDate} handleEndDateChange={handleEndDateChange} /> */}
+       
+        <table>
+        <thead>
+          <tr>
+            <th>PO</th>
+            <th>Date</th>
+            <th>Zipcode</th>
+            <th>Price</th>
+            <th>Service</th>
+            {/* <th>Update</th> */}
+            <th>Dispatch</th>
+            <th>PDF</th>
+          </tr>
+        </thead>
+        <tbody>
+          {state?.response?.map((item) => (
+          //  {data.map((item) => (
+            <tr key={item.PO}>
+              <td><div className='font-semibold'>{item.PO}</div></td>
+              <td><div className=' text-base text-center'>{item.createdAT.split(",")[0]}</div></td>
+              <td><div className='font-semibold'>{extractZipCode(item.towFrom)}</div></td>
+              <td>{item.price}</td>
+              <td className='text-sm'>{item.serviceType}</td>
+             {/* <td> 
+                <label className="custom-checkbox flex items-center justify-center">
+                  <input type="checkbox" className='mt-2 ml-2' checked={item.update ? true :  false}  data-update-id={item.PO} onChange={(e) => handleCheckboxChange(e, item)}/>
+                </label>
+                </td> */}
+               <td className=''> 
+                <label className="custom-checkbox flex items-center justify-center text-center">
+                  <input type="checkbox" className='mt-2 ml-2'  data-dispatch-id={item.PO} onChange={(e) => handleDispatchCheckboxChange(e, item)}    />
+                </label>
+              </td> 
+              <td data-pdf-id={item.PO} className=''> 
+              </td>
+            </tr>
+          ))}
+        </tbody>
+        </table>
+        <button disabled={state.response ? false : true} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded  outline outline-none focus:outline-none mt-9" onClick={async()=>{
+          
+              let arr0=[]
+              for(let i=0;i<dispatch.length;i++){
+                arr0.push(state.response.filter(it=>it.PO==dispatch[i])[0])
+              }
+              console.log("%%%%$$$$ $$$$%%%%%",arr0)
+
+
+              for(let i=0;i<arr0.length;i++){
+
+                const dispatchId =arr0[i].PO ; // Replace with the actual ID you're looking for
+                const checkbox = document.querySelector(`input[type="checkbox"][data-dispatch-id="${dispatchId}"]`);
+                const checkboxPDF = document.querySelector(`td[data-pdf-id="${dispatchId}"]`);
+                
+                if (checkbox && !checkbox.disabled) {
+
+                  let {id,...obj0}=arr0[i]
+            
+
+                // await fetch('http://localhost:3000/api/dispatch', {
+                await fetch('/api/dispatch', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    
+                    },
+                    body: JSON.stringify(obj0),
+                  }).then(res=>{
+                    res.json().then(response=>{
+                        if(response.error){
+                            alert(`${response.error} for this user`)
+                        }
+                        else{
+                            console.log("$$$$$$ response $$$$$$",response)
+                            if(response.callId){
+                              checkbox.parentElement.parentElement.classList.add("bg-green-500")
+                              checkbox.disabled=true
+                            }
+                            else{
+                              checkbox.parentElement.parentElement.classList.add("bg-red-500")
+                            }
+
+                            if(response.invoice?.msg){
+                              checkboxPDF.classList.add("bg-green-500")
+                            }
+                            else{
+                              checkboxPDF.classList.add("bg-red-500")
+                            }
+                        }
+                    })
+                })     
+                }
+              }
+      }}>
+          Dispatch
+      </button>
+
+      <button disabled={state.response ? false : true} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 ml-4 rounded  outline outline-none focus:outline-none mt-9" onClick={async()=>{
+           const response = await fetch('/api/sendEmail');
+           let data=await response.json()
+           let arr=data?.message?.split("\n")
+           setFiles(parseJsonFromString(arr[0])?.file_names)
+           console.log("$$$$$ from response $$$$$",arr,parseJsonFromString(arr[0]).file_names)
+
+      }}>
+        Send Email
+      </button>
+     
+      <br/>
+      <div className='pt-9'>
+        {files?.length>1 ? <div className='font-bold text-slate-800'>Files sent via email</div> : null}
+        {files?.map((item,index)=>{
+          return <div className='text-slate-600 font-bold' key={item}>
+                    <a>{index+1} - {item}</a>
+                </div>
+        })}
+      </div>
+      <div>{sum}</div>
+      </div> : (state.response ? <h1 className='text-gray-500'>Not authorized</h1> :  <h4>Loading...</h4>)) : <h4>Loading...</h4>}
+      
+      
+    </div>)
+  );
+}
+
+export default Hero;

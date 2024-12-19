@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  white-space: pre-wrap; 
+  word-break: break-all; 
+}
+
+p code {
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+#__next {
+  height: 100%;
+}
+
+#nav-mobile {
+  min-height: 170px;
+}
+
+.nav-item.dropdown .dropdown-item {
+  padding: 0;
+}
+
+.nav-item.dropdown .dropdown-item a {
+  color: inherit;
+}
+
+.nav-item.dropdown .dropdown-item .navbar-item {
+  width: 100%;
+  padding: .55rem 1.5rem;
+}
+
+.result-block-container .result-block {
+  opacity: 1;
+}
+
+
+.logo1 {
+  /* background-image: url(https://towingroadsidehouston.com/wp-content/themes/towingroadsidehouston/logo/logo_roadside_houston.png) !important; */
+  background-image: url(https://towingroadsidehouston.com/wp-content/uploads/2024/01/logo0.png) !important;
+  width: full; /* Adjust as needed */
+  height: 138px; /* Adjust as needed */
+  background-repeat: no-repeat;
+  background-size: contain; /* or cover, depending on your needs */
+  background-position: center;
+}
+
+#button-date{
+  width: 180px !important;
+  height: 60px !important;
+  padding: 5px;
+}
+
+
+.table-container {
+  margin: 20px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 900px;
+}
+
+thead {
+  background-color: #f8f8f8;
+  font-weight: bold;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #e9e9e9;
+}
+
+
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tr:hover {
+  background-color: #ddd;
+}
+
+input[type='text'] {
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+button {
+  border: none;
+  background-color: #2196f3;
+  color: white;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: #0c7cd5;
+}
+
+
+.datePicker{
+  display: flex;         /* Enable Flexbox */
+  justify-content: center;/* Center horizontally */
+  align-items: center;    /* Center vertically */
+  /* height: 100vh;           */
+  text-align: center;     /* Center text for inline or inline-block elements */
+}
+
+
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.custom-checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  cursor: pointer;
+}
+
+
+
+/* Add this to your CSS or a style tag in your component */
+.driver-column {
+  width: 150px; /* Adjust this value based on your needs */
+}
+
+.driver-column-content {
+  white-space: nowrap; /* Prevents wrapping of the text */
+  overflow: hidden;    /* Ensures text doesn't overflow */
+  text-overflow: ellipsis; /* Adds '...' if the text is too long */
+}
