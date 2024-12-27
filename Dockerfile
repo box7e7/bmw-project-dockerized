@@ -60,22 +60,27 @@ RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add
 # Install Google Chrome Stable
 RUN apt-get update && apt-get install -y google-chrome-stable --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
+
 # Set up cron jobs
 RUN mkdir -p /app/scripts
 
-# Create crontab file
-RUN echo "3 */4 * * * cd /app/scripts && node getCookies.js\n\
-3 */6 * * * cd /app/scripts && node getCookies_towbook18.js\n\
-*/10 * * * * cd /app/scripts && /bin/bash getBmwJobs.sh" > /etc/cron.d/app-cron
+# Create crontab file with environment sourcing and full paths
+RUN echo "3 */4 * * * . /etc/cron.env && cd /app/scripts && /usr/local/bin/node getCookies.js >> /var/log/cron.log 2>&1\n\
+3 */6 * * * . /etc/cron.env && cd /app/scripts && /usr/local/bin/node getCookies_towbook18.js >> /var/log/cron.log 2>&1\n\
+*/10 * * * * . /etc/cron.env && cd /app/scripts && /bin/bash getBmwJobs.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/app-cron
 
-# Give execution rights on the cron job
+# Give execution rights on the cron job and set proper permissions
 RUN chmod 0644 /etc/cron.d/app-cron
+
+# Create log file and give proper permissions
+RUN touch /var/log/cron.log && chmod 0644 /var/log/cron.log
+
+# Save environment variables for cron jobs
+RUN env | grep -E 'PATH|NODE|HOME|PUPPETEER' > /etc/cron.env
 
 # Apply cron job
 RUN crontab /etc/cron.d/app-cron
 
-# Create the log file to be able to run tail
-RUN touch /var/log/cron.log
 # Copy the .ssh directory from the build context (host machine) to /root/.ssh in the container
 COPY .ssh /root/.ssh
 
@@ -87,10 +92,7 @@ COPY --from=builder /app /app
 # Install production dependencies
 RUN yarn install --frozen-lockfile --production
 
-
 # Expose the port that Next.js listens on
 EXPOSE 3000
-
-
 
 CMD ["/bin/sh","/app/start_with_ssh_tunnel.sh"]

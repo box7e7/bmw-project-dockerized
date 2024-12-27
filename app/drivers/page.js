@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import DriverForm from '../../components/DriverForm';
+import Loading from '../../components/Loading';
 import './drivers.css';
 
 export default function DriversPage() {
@@ -73,7 +74,7 @@ export default function DriversPage() {
         }
     };
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading) return <Loading />;
     if (userError) return <div>Error: {userError.message}</div>;
     if (!user) return <div>Please log in to access this page.</div>;
 
@@ -117,7 +118,9 @@ export default function DriversPage() {
                     <tbody className="bg-white divide-y divide-gray-200">
                         {loading ? (
                             <tr>
-                                <td colSpan="4" className="px-6 py-4 text-center text-xs md:text-base">Loading drivers...</td>
+                                <td colSpan="4" className="px-6 py-4 text-center">
+                                    <Loading />
+                                </td>
                             </tr>
                         ) : drivers.length === 0 ? (
                             <tr>

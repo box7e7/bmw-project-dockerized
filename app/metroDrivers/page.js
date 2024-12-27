@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Loading from '../../components/Loading';
 
 export default function MetroDrivers() {
     const [drivers, setDrivers] = useState([]);
@@ -27,8 +28,8 @@ export default function MetroDrivers() {
     }, []);
 
     if (loading) return (
-        <div className="min-h-screen p-4">
-            <div className="text-center">Loading drivers...</div>
+        <div className="container mx-auto px-4 py-8">
+            <Loading />
         </div>
     );
 

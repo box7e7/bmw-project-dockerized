@@ -5,6 +5,7 @@ import DateRangeSelector from '../components/DateRangeSelector';
 import "react-datepicker/dist/react-datepicker.css";
 import Logo from './Logo';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import Loading from './Loading';
 
 // function extractZipCode(address) {
 //   const regex = /,\s*TX\s+(\d{5}(?:-\d{4})?)\b/;
@@ -326,7 +327,7 @@ const Hero = () =>{
           })}
         </div>
         <div>{sum}</div>
-        </div> : (state.response ? <h1 className='text-gray-500'>Not authorized</h1> :  <h4>Loading...</h4>)) : <h4>Loading...</h4>}
+        </div> : (state.response ? <h1 className='text-gray-500'>Not authorized</h1> : <Loading />)) : <Loading />}
         
       </div>
 

@@ -25,6 +25,7 @@ const customArgs = [
 
         const browser = await puppeteer.launch({
           headless: true,
+          executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable',
           // headless: false, 
           ignoreDefaultArgs: ["--disable-extensions"],
           // ignoreDefaultArgs: ["--disable-extensions","--enable-automation"],
